@@ -4,21 +4,19 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fyfirman/auth-management-go/internal/auth/app"
+	"github.com/fyfirman/auth-management-go/internal/app"
+	"github.com/fyfirman/auth-management-go/internal/service"
 )
 
 func main() {
-	mux := http.NewServeMux()
+	userService := service.NewUserService()
+	userHandler := app.NewUserHandler(userService)
 
-	// Initialize the handler
-	handler := app.NewHandler()
-
-	// Setup the API routes
-	handler.SetupRoutes(mux)
+	http.HandleFunc("/register", userHandler.Register)
 
 	// Start the HTTP server
 	log.Println("Starting server on :8080")
-	if err := http.ListenAndServe(":8080", mux); err != nil {
+	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

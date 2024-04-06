@@ -5,11 +5,15 @@ import (
 	"net/http"
 
 	"github.com/fyfirman/auth-management-go/internal/app"
+	"github.com/fyfirman/auth-management-go/internal/repository"
 	"github.com/fyfirman/auth-management-go/internal/service"
 )
 
 func main() {
-	userService := service.NewUserService()
+	repository.ConnectDB()
+
+	userRepository := repository.NewUserRepository()
+	userService := service.NewUserService(userRepository)
 	userHandler := app.NewUserHandler(userService)
 
 	http.HandleFunc("/register", userHandler.Register)

@@ -1,22 +1,39 @@
 package service
 
 import (
+	"context"
 	"time"
 
+	"github.com/fyfirman/auth-management-go/internal/datastruct"
 	"github.com/fyfirman/auth-management-go/internal/dto"
+	"github.com/fyfirman/auth-management-go/internal/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
-	// Here, you would typically have a repository for database operations.
+	userRepository *repository.UserRepository
 }
 
-func NewUserService() *UserService {
-	return &UserService{}
+func NewUserService(userRepository *repository.UserRepository) *UserService {
+	return &UserService{userRepository: userRepository}
 }
 
-func (s *UserService) RegisterUser(req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
-	// Here, you would hash the password and save the user to the database.
-	// This example simply returns a mock response.
+func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
+	hashedPassword, err := hashPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	user := &datastruct.User{
+		Username:     req.Username,
+		Email:        req.Email,
+		PasswordHash: hashedPassword,
+	}
+
+	err = s.userRepository.CreateUser(ctx, user)
+	if err != nil {
+		return nil, err
+	}
 
 	response := &dto.RegisterResponse{
 		ID:        1, // Mock ID
@@ -26,4 +43,12 @@ func (s *UserService) RegisterUser(req *dto.RegisterRequest) (*dto.RegisterRespo
 	}
 
 	return response, nil
+}
+
+func hashPassword(password string) (string, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashedPassword), nil
 }

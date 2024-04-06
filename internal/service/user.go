@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"time"
 
 	"github.com/fyfirman/auth-management-go/internal/datastruct"
 	"github.com/fyfirman/auth-management-go/internal/dto"
@@ -36,10 +35,11 @@ func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest
 	}
 
 	response := &dto.RegisterResponse{
-		ID:        1, // Mock ID
+		ID:        int64(user.ID),
 		Username:  req.Username,
 		Email:     req.Email,
-		CreatedAt: time.Now(),
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
 
 	return response, nil

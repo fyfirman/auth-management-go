@@ -30,3 +30,13 @@
   This command runs the compiled binary. 
 
 Remember to copy `.env.example` to `.env` and replace the values
+
+## Run PostgreSQL with Docker
+
+```sh
+docker run --name my-postgresql \
+  -e POSTGRES_PASSWORD=mysecretpassword \
+  -e POSTGRES_DB=auth_management\
+  -p 15432:5432 \
+  -d postgres:13
+````

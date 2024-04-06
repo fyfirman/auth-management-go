@@ -43,3 +43,16 @@ build:
 # Run the Go application
 run:
 	go run ./cmd/main.go
+
+# Run test for all directories
+test:
+	go test -v ./...
+
+
+# Run test for CI mode
+test-ci:
+	go test -coverprofile coverage.out ./...
+
+# Run test get coverage with HTML format
+test-html:
+	go test -coverprofile=coverage.out ./... ;    go tool cover -html=coverage.out

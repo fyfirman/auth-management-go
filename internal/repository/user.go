@@ -6,6 +6,11 @@ import (
 	"github.com/fyfirman/auth-management-go/internal/datastruct"
 )
 
+type UserRepositoryInterface interface {
+	CreateUser(ctx context.Context, user *datastruct.User) error
+	FindByEmail(ctx context.Context, email string) (*datastruct.User, error)
+}
+
 type UserRepository struct{}
 
 func NewUserRepository() *UserRepository {

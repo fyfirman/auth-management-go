@@ -15,11 +15,11 @@ import (
 )
 
 type UserService struct {
-	userRepository *repository.UserRepository
+	UserRepository repository.UserRepositoryInterface
 }
 
-func NewUserService(userRepository *repository.UserRepository) *UserService {
-	return &UserService{userRepository: userRepository}
+func NewUserService(userRepository repository.UserRepositoryInterface) *UserService {
+	return &UserService{UserRepository: userRepository}
 }
 
 func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
@@ -34,7 +34,7 @@ func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest
 		PasswordHash: hashedPassword,
 	}
 
-	err = s.userRepository.CreateUser(ctx, user)
+	err = s.UserRepository.CreateUser(ctx, user)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest
 }
 
 func (s *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error) {
-	user, err := s.userRepository.FindByEmail(ctx, req.Email)
+	user, err := s.UserRepository.FindByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}

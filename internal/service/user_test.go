@@ -16,7 +16,7 @@ import (
 
 func TestUserService_RegisterUser(t *testing.T) {
 	userRepository := new(mocks.UserRepositoryInterface)
-	userService := service.UserService{UserRepository: userRepository}
+	userService := service.NewUserService(userRepository)
 
 	ctx := context.TODO()
 	req := &dto.RegisterRequest{
@@ -45,7 +45,7 @@ func TestUserService_Login(t *testing.T) {
 	t.Setenv("JWT_SECRET", "secret_jwt")
 	t.Setenv("JWT_EXPIRY_TIME", "100000")
 	userRepository := new(mocks.UserRepositoryInterface)
-	userService := service.UserService{UserRepository: userRepository}
+	userService := service.NewUserService(userRepository)
 
 	ctx := context.TODO()
 	email := "test@example.com"
@@ -81,7 +81,7 @@ func TestUserService_Login(t *testing.T) {
 
 func TestUserService_Login_InvalidCredentials(t *testing.T) {
 	userRepository := new(mocks.UserRepositoryInterface)
-	userService := service.UserService{UserRepository: userRepository}
+	userService := service.NewUserService(userRepository)
 
 	ctx := context.TODO()
 	email := "test@example.com"

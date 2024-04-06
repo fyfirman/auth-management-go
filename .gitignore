@@ -26,3 +26,5 @@ myapp
 # OS files
 .DS_Store
 Thumbs.db
+
+auth_management

@@ -31,11 +31,11 @@ func ParseUserRole(str string) (UserRole, bool) {
 }
 
 type User struct {
-	ID           uint     `gorm:"primaryKey"`
-	Username     string   `gorm:"unique;not null"`
-	Email        string   `gorm:"unique;not null"`
-	Role         UserRole `gorm:"not null"`
-	PasswordHash string   `gorm:"not null"`
+	ID           uint   `gorm:"primaryKey"`
+	Username     string `gorm:"unique;not null"`
+	Email        string `gorm:"unique;not null"`
+	Role         string `gorm:"not null"`
+	PasswordHash string `gorm:"not null"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }

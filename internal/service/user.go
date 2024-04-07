@@ -33,16 +33,10 @@ func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest
 		return nil, err
 	}
 
-	role, ok := datastruct.ParseUserRole(req.Role)
-
-	if !ok {
-		return nil, errors.New("Cannot parse user role")
-	}
-
 	user := &datastruct.User{
 		Username:     req.Username,
 		Email:        req.Email,
-		Role:         role,
+		Role:         req.Role,
 		PasswordHash: hashedPassword,
 	}
 
@@ -73,7 +67,7 @@ func (s *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 		return nil, errors.New("invalid credentials")
 	}
 
-	token, err := generateJWT(user.ID)
+	token, err := generateJWT(user)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +83,7 @@ func hashPassword(password string) (string, error) {
 	return string(hashedPassword), nil
 }
 
-func generateJWT(userID uint) (string, error) {
+func generateJWT(user *datastruct.User) (string, error) {
 	var jwtSecretKey = []byte(os.Getenv("JWT_SECRET"))
 	expiryTimeInSecondsStr := os.Getenv("JWT_EXPIRY_TIME")
 	expiryTimeInSeconds, err := strconv.Atoi(expiryTimeInSecondsStr)
@@ -99,8 +93,9 @@ func generateJWT(userID uint) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": userID,
-		"exp":     time.Now().Add(time.Duration(expiryTimeInSeconds) * time.Second).Unix(),
+		"exp":       time.Now().Add(time.Duration(expiryTimeInSeconds) * time.Second).Unix(),
+		"user_id":   user.ID,
+		"user_role": user.Role,
 	})
 
 	tokenString, err := token.SignedString(jwtSecretKey)

@@ -10,7 +10,11 @@ import (
 )
 
 func main() {
-	repository.ConnectDB()
+	_, err := repository.ConnectDB()
+	if err != nil {
+		log.Println("Error connecting to database")
+		return
+	}
 
 	userRepository := repository.NewUserRepository()
 	userService := service.NewUserService(userRepository)

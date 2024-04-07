@@ -36,6 +36,7 @@ func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest
 	user := &datastruct.User{
 		Username:     req.Username,
 		Email:        req.Email,
+		Role:         datastruct.Admin,
 		PasswordHash: hashedPassword,
 	}
 
@@ -86,6 +87,7 @@ func generateJWT(userID uint) (string, error) {
 	var jwtSecretKey = []byte(os.Getenv("JWT_SECRET"))
 	expiryTimeInSecondsStr := os.Getenv("JWT_EXPIRY_TIME")
 	expiryTimeInSeconds, err := strconv.Atoi(expiryTimeInSecondsStr)
+
 	if err != nil {
 		return "", err
 	}

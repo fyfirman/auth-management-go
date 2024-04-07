@@ -51,8 +51,8 @@ test:
 
 # Run test for CI mode
 test-ci:
-	go test -coverprofile coverage.out ./...
+	go test -coverprofile=coverage.out.tmp ./... | grep -v "/mocks"
 
 # Run test get coverage with HTML format
 test-html:
-	go test -coverprofile=coverage.out ./... ;    go tool cover -html=coverage.out
+	go test -coverprofile=coverage.out.tmp ./... ; cat coverage.out.tmp | grep -v "/mocks" > coverage.out ;  go tool cover -html=coverage.out

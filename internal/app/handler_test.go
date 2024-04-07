@@ -18,7 +18,7 @@ import (
 func TestUserHandler_Register(t *testing.T) {
 	mockUserService := new(mocks.UserServiceInterface)
 
-	ctx := context.TODO()
+	ctx := context.Background()
 	// Create a new instance of UserHandler
 	handler := app.NewUserHandler(mockUserService)
 

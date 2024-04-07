@@ -28,3 +28,4 @@ myapp
 Thumbs.db
 
 auth_management
+coverage.out.tmp

@@ -14,6 +14,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+type UserServiceInterface interface {
+	repository.UserRepositoryInterface
+	RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
+	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
+}
+
 type UserService struct {
 	userRepository repository.UserRepositoryInterface
 }

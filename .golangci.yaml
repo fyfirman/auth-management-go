@@ -18,5 +18,5 @@ linters:
     - nlreturn
   fast: false
 severity:
-  default-severity: error
+  default-severity: warn
   case-sensitive: false

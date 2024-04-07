@@ -1,6 +1,7 @@
 package datastruct
 
 import (
+	"strings"
 	"time"
 )
 
@@ -14,6 +15,19 @@ const (
 
 func (r UserRole) String() string {
 	return [...]string{"superadmin", "admin", "general-user"}[r]
+}
+
+var (
+	userRoleMap = map[string]UserRole{
+		"superadmin":   SuperAdmin,
+		"admin":        Admin,
+		"general-user": GeneralUser,
+	}
+)
+
+func ParseUserRole(str string) (UserRole, bool) {
+	c, ok := userRoleMap[strings.ToLower(str)]
+	return c, ok
 }
 
 type User struct {

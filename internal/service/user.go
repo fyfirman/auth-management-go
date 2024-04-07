@@ -33,10 +33,16 @@ func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest
 		return nil, err
 	}
 
+	role, ok := datastruct.ParseUserRole(req.Role)
+
+	if !ok {
+		return nil, errors.New("Cannot parse user role")
+	}
+
 	user := &datastruct.User{
 		Username:     req.Username,
 		Email:        req.Email,
-		Role:         datastruct.Admin,
+		Role:         role,
 		PasswordHash: hashedPassword,
 	}
 

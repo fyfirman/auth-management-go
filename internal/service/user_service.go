@@ -12,6 +12,7 @@ import (
 	"github.com/fyfirman/auth-management-go/internal/datastruct"
 	"github.com/fyfirman/auth-management-go/internal/dto"
 	"github.com/fyfirman/auth-management-go/internal/repository"
+	"github.com/fyfirman/auth-management-go/pkg/mail_server"
 	"github.com/golang-jwt/jwt/v4"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -105,6 +106,17 @@ func (s *UserService) ResetPassword(
 		return nil, err
 	}
 
+	mailClient := mail_server.New()
+	_, err = mailClient.Send(&mail_server.SendEmailRequest{
+		From:    os.Getenv("EMAIL_SENDER"),
+		To:      []string{user.Email},
+		Subject: "Auth management - Reset Password Request",
+		Html:    "<p> This is your reset password link : " + os.Getenv("BASE_URL") + "/reset-password/" + token + "</p>",
+	})
+
+	if err != nil {
+		return nil, err
+	}
 	return &dto.ResetPasswordResponse{Token: token}, nil
 }
 

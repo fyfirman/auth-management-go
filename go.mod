@@ -3,9 +3,11 @@ module github.com/fyfirman/auth-management-go
 go 1.22
 
 require (
+	github.com/go-playground/assert/v2 v2.2.0
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.19.0
 	github.com/golang-jwt/jwt/v4 v4.5.0
+	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.22.0
 	gorm.io/driver/postgres v1.5.7

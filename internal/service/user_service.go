@@ -17,6 +17,7 @@ import (
 type UserServiceInterface interface {
 	RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
+	ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error)
 }
 
 type UserService struct {
@@ -73,6 +74,11 @@ func (s *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 	}
 
 	return &dto.LoginResponse{Token: token}, nil
+}
+
+func (s *UserService) ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error) {
+
+	return &dto.ResetPasswordResponse{Token: ""}, nil
 }
 
 func hashPassword(password string) (string, error) {

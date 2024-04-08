@@ -2,6 +2,8 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
+	"encoding/base32"
 	"errors"
 	"os"
 	"strconv"
@@ -21,11 +23,15 @@ type UserServiceInterface interface {
 }
 
 type UserService struct {
-	userRepository repository.UserRepositoryInterface
+	userRepository  repository.UserRepositoryInterface
+	tokenRepository repository.TokenRepositoryInterface
 }
 
-func NewUserService(userRepository repository.UserRepositoryInterface) *UserService {
-	return &UserService{userRepository: userRepository}
+func NewUserService(
+	userRepository repository.UserRepositoryInterface,
+	tokenRepository repository.TokenRepositoryInterface,
+) *UserService {
+	return &UserService{userRepository: userRepository, tokenRepository: tokenRepository}
 }
 
 func (s *UserService) RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
@@ -76,9 +82,30 @@ func (s *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 	return &dto.LoginResponse{Token: token}, nil
 }
 
-func (s *UserService) ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error) {
+func (s *UserService) ResetPassword(
+	ctx context.Context,
+	req dto.ResetPasswordRequest,
+) (*dto.ResetPasswordResponse, error) {
+	user, err := s.userRepository.FindByEmail(ctx, req.Email)
+	if err != nil {
+		return nil, err
+	}
 
-	return &dto.ResetPasswordResponse{Token: ""}, nil
+	expiryTimeInSeconds := 60 * 60
+
+	token := generateResetPasswordToken()
+
+	err = s.tokenRepository.CreateToken(ctx, &datastruct.Token{
+		Token:     token,
+		UserId:    user.ID,
+		ExpiredAt: time.Now().Add(time.Duration(expiryTimeInSeconds) * time.Second),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.ResetPasswordResponse{Token: token}, nil
 }
 
 func hashPassword(password string) (string, error) {
@@ -110,4 +137,12 @@ func generateJWT(user *datastruct.User) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func generateResetPasswordToken() string {
+	bytes := make([]byte, 15)
+	rand.Read(bytes)
+	token := base32.StdEncoding.EncodeToString(bytes)
+
+	return token
 }

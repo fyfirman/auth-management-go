@@ -16,7 +16,8 @@ import (
 
 func TestUserService_RegisterUser(t *testing.T) {
 	userRepository := new(mocks.UserRepositoryInterface)
-	userService := service.NewUserService(userRepository)
+	tokenRepository := new(mocks.TokenRepositoryInterface)
+	userService := service.NewUserService(userRepository, tokenRepository)
 
 	ctx := context.TODO()
 	req := &dto.RegisterRequest{
@@ -45,7 +46,9 @@ func TestUserService_Login(t *testing.T) {
 	t.Setenv("JWT_SECRET", "secret_jwt")
 	t.Setenv("JWT_EXPIRY_TIME", "100000")
 	userRepository := new(mocks.UserRepositoryInterface)
-	userService := service.NewUserService(userRepository)
+	tokenRepository := new(mocks.TokenRepositoryInterface)
+
+	userService := service.NewUserService(userRepository, tokenRepository)
 
 	ctx := context.TODO()
 	email := "test@example.com"
@@ -81,7 +84,8 @@ func TestUserService_Login(t *testing.T) {
 
 func TestUserService_Login_InvalidCredentials(t *testing.T) {
 	userRepository := new(mocks.UserRepositoryInterface)
-	userService := service.NewUserService(userRepository)
+	mockTokenRepo := new(mocks.TokenRepositoryInterface)
+	userService := service.NewUserService(userRepository, mockTokenRepo)
 
 	ctx := context.TODO()
 	email := "test@example.com"
@@ -113,4 +117,57 @@ func TestUserService_Login_InvalidCredentials(t *testing.T) {
 	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
 	assert.Error(t, err)
 	assert.True(t, errors.Is(err, bcrypt.ErrMismatchedHashAndPassword))
+}
+
+func TestResetPassword(t *testing.T) {
+	ctx := context.Background()
+
+	user := &datastruct.User{ID: 1, Email: "test@example.com"}
+
+	t.Run("success", func(t *testing.T) {
+		mockUserRepo := new(mocks.UserRepositoryInterface)
+		mockTokenRepo := new(mocks.TokenRepositoryInterface)
+		userService := service.NewUserService(mockUserRepo, mockTokenRepo)
+
+		mockUserRepo.On("FindByEmail", ctx, user.Email).Return(user, nil)
+		mockTokenRepo.On("CreateToken", ctx, mock.AnythingOfType("*datastruct.Token")).Return(nil)
+
+		resp, err := userService.ResetPassword(ctx, dto.ResetPasswordRequest{Email: user.Email})
+
+		assert.NoError(t, err)
+		assert.NotNil(t, resp)
+		assert.NotEmpty(t, resp.Token)
+		mockUserRepo.AssertExpectations(t)
+		mockTokenRepo.AssertExpectations(t)
+	})
+
+	t.Run("FindByEmail error", func(t *testing.T) {
+		mockUserRepo := new(mocks.UserRepositoryInterface)
+		mockTokenRepo := new(mocks.TokenRepositoryInterface)
+		userService := service.NewUserService(mockUserRepo, mockTokenRepo)
+
+		mockUserRepo.On("FindByEmail", ctx, user.Email).Return(nil, errors.New("user not found"))
+
+		resp, err := userService.ResetPassword(ctx, dto.ResetPasswordRequest{Email: user.Email})
+
+		assert.Error(t, err)
+		assert.Nil(t, resp)
+		mockUserRepo.AssertExpectations(t)
+	})
+
+	t.Run("CreateToken error", func(t *testing.T) {
+		mockUserRepo := new(mocks.UserRepositoryInterface)
+		mockTokenRepo := new(mocks.TokenRepositoryInterface)
+		userService := service.NewUserService(mockUserRepo, mockTokenRepo)
+
+		mockUserRepo.On("FindByEmail", ctx, user.Email).Return(user, nil)
+		mockTokenRepo.On("CreateToken", ctx, mock.AnythingOfType("*datastruct.Token")).Return(errors.New("db error"))
+
+		resp, err := userService.ResetPassword(ctx, dto.ResetPasswordRequest{Email: user.Email})
+
+		assert.Error(t, err)
+		assert.Nil(t, resp)
+		mockUserRepo.AssertExpectations(t)
+		mockTokenRepo.AssertExpectations(t)
+	})
 }

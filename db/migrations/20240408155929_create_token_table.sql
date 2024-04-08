@@ -2,7 +2,7 @@
 -- +goose StatementBegin
 CREATE TABLE tokens (
   token VARCHAR(255) NOT NULL UNIQUE,
-  expires_at INTEGER NOT NULL,
+  expired_at DATE NOT NULL,
   user_id INTEGER NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
 );

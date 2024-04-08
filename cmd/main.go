@@ -17,11 +17,14 @@ func main() {
 	}
 
 	userRepository := repository.NewUserRepository()
-	userService := service.NewUserService(userRepository)
+	tokenRepository := repository.NewTokenRepository()
+
+	userService := service.NewUserService(userRepository, tokenRepository)
 	userHandler := app.NewUserHandler(userService)
 
 	http.HandleFunc("/register", userHandler.Register)
 	http.HandleFunc("/login", userHandler.Login)
+	http.HandleFunc("/reset-password", userHandler.ResetPassword)
 
 	// Start the HTTP server
 	log.Println("Starting server on :8080")

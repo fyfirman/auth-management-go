@@ -100,62 +100,62 @@ func TestUserHandler_Register_InvalidRequest(t *testing.T) {
 	// TODO: Check the response body
 }
 
-func TestResetPassword(t *testing.T) {
+func TestForgotPasswordPassword(t *testing.T) {
 	t.Run("invalid request body", func(t *testing.T) {
 		mockUserService := new(mocks.UserServiceInterface) // Reinitialize mock
 		handler := app.NewUserHandler(mockUserService)     // Assume this correctly creates a handler
 
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBufferString("{invalid json"))
+		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBufferString("{invalid json"))
 		recorder := httptest.NewRecorder()
 
-		handler.ResetPassword(recorder, req)
+		handler.ForgotPasswordPassword(recorder, req)
 
 		if recorder.Code != http.StatusBadRequest {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, recorder.Code)
 		}
 	})
 
-	t.Run("userService ResetPassword error", func(t *testing.T) {
+	t.Run("userService ForgotPasswordPassword error", func(t *testing.T) {
 		mockUserService := new(mocks.UserServiceInterface) // Reinitialize mock
-		handler := app.NewUserHandler(mockUserService)     // Reset handler with a new mock
+		handler := app.NewUserHandler(mockUserService)     // ForgotPassword handler with a new mock
 
-		reqBody, _ := json.Marshal(dto.ResetPasswordRequest{Email: "user@example.com"})
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBuffer(reqBody))
+		reqBody, _ := json.Marshal(dto.ForgotPasswordPasswordRequest{Email: "user@example.com"})
+		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBuffer(reqBody))
 		recorder := httptest.NewRecorder()
 
-		mockUserService.On("ResetPassword", mock.Anything, mock.AnythingOfType("dto.ResetPasswordRequest")).Return(nil, errors.New("internal server error"))
+		mockUserService.On("ForgotPasswordPassword", mock.Anything, mock.AnythingOfType("dto.ForgotPasswordPasswordRequest")).Return(nil, errors.New("internal server error"))
 
-		handler.ResetPassword(recorder, req)
+		handler.ForgotPasswordPassword(recorder, req)
 
 		if recorder.Code != http.StatusInternalServerError {
 			t.Errorf("expected status code %d, got %d", http.StatusInternalServerError, recorder.Code)
 		}
 	})
 
-	t.Run("successful reset password", func(t *testing.T) {
+	t.Run("successful forgot password", func(t *testing.T) {
 		mockUserService := new(mocks.UserServiceInterface) // Reinitialize mock for isolation
-		handler := app.NewUserHandler(mockUserService)     // Reset handler with the new mock
+		handler := app.NewUserHandler(mockUserService)     // ForgotPassword handler with the new mock
 
-		resetResponse := &dto.ResetPasswordResponse{Token: "Password reset successfully"}
-		reqBody, _ := json.Marshal(dto.ResetPasswordRequest{Email: "user@example.com"})
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBuffer(reqBody))
+		forgotResponse := &dto.ForgotPasswordPasswordResponse{Token: "Password forgot successfully"}
+		reqBody, _ := json.Marshal(dto.ForgotPasswordPasswordRequest{Email: "user@example.com"})
+		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBuffer(reqBody))
 		recorder := httptest.NewRecorder()
 
-		mockUserService.On("ResetPassword", mock.Anything, mock.AnythingOfType("dto.ResetPasswordRequest")).Return(resetResponse, nil)
+		mockUserService.On("ForgotPasswordPassword", mock.Anything, mock.AnythingOfType("dto.ForgotPasswordPasswordRequest")).Return(forgotResponse, nil)
 
-		handler.ResetPassword(recorder, req)
+		handler.ForgotPasswordPassword(recorder, req)
 
 		if recorder.Code != http.StatusOK {
 			t.Errorf("expected status code %d, got %d", http.StatusOK, recorder.Code)
 		}
 
-		var response dto.ResetPasswordResponse
+		var response dto.ForgotPasswordPasswordResponse
 		if err := json.NewDecoder(recorder.Body).Decode(&response); err != nil {
 			t.Fatal("failed to decode response")
 		}
 
-		if response.Token != resetResponse.Token {
-			t.Errorf("expected message %q, got %q", resetResponse.Token, response.Token)
+		if response.Token != forgotResponse.Token {
+			t.Errorf("expected message %q, got %q", forgotResponse.Token, response.Token)
 		}
 
 		mockUserService.AssertExpectations(t) // Ensure all expected interactions were made

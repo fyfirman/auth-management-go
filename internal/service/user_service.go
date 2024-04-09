@@ -20,7 +20,7 @@ import (
 type UserServiceInterface interface {
 	RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
-	ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error)
+	ForgotPasswordPassword(ctx context.Context, req dto.ForgotPasswordPasswordRequest) (*dto.ForgotPasswordPasswordResponse, error)
 }
 
 type UserService struct {
@@ -83,10 +83,10 @@ func (s *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 	return &dto.LoginResponse{Token: token}, nil
 }
 
-func (s *UserService) ResetPassword(
+func (s *UserService) ForgotPasswordPassword(
 	ctx context.Context,
-	req dto.ResetPasswordRequest,
-) (*dto.ResetPasswordResponse, error) {
+	req dto.ForgotPasswordPasswordRequest,
+) (*dto.ForgotPasswordPasswordResponse, error) {
 	user, err := s.userRepository.FindByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (s *UserService) ResetPassword(
 
 	expiryTimeInSeconds := 60 * 60
 
-	token := generateResetPasswordToken()
+	token := generateForgotPasswordPasswordToken()
 
 	err = s.tokenRepository.CreateToken(ctx, &datastruct.Token{
 		Token:     token,
@@ -110,14 +110,14 @@ func (s *UserService) ResetPassword(
 	_, err = mailClient.Send(&mail_server.SendEmailRequest{
 		From:    os.Getenv("EMAIL_SENDER"),
 		To:      []string{user.Email},
-		Subject: "Auth management - Reset Password Request",
-		Html:    "<p> This is your reset password link : " + os.Getenv("BASE_URL") + "/reset-password/" + token + "</p>",
+		Subject: "Auth management - ForgotPassword Password Request",
+		Html:    "<p> This is your forgot password link : " + os.Getenv("BASE_URL") + "/forgot-password/" + token + "</p>",
 	})
 
 	if err != nil {
 		return nil, err
 	}
-	return &dto.ResetPasswordResponse{Token: token}, nil
+	return &dto.ForgotPasswordPasswordResponse{Token: token}, nil
 }
 
 func hashPassword(password string) (string, error) {
@@ -151,7 +151,7 @@ func generateJWT(user *datastruct.User) (string, error) {
 	return tokenString, nil
 }
 
-func generateResetPasswordToken() string {
+func generateForgotPasswordPasswordToken() string {
 	bytes := make([]byte, 15)
 	rand.Read(bytes)
 	token := base32.StdEncoding.EncodeToString(bytes)

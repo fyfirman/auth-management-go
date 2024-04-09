@@ -20,7 +20,7 @@ import (
 type UserServiceInterface interface {
 	RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
-	ForgotPasswordPassword(ctx context.Context, req dto.ForgotPasswordPasswordRequest) (*dto.ForgotPasswordPasswordResponse, error)
+	ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) (*dto.ForgotPasswordResponse, error)
 }
 
 type UserService struct {
@@ -83,10 +83,10 @@ func (s *UserService) Login(ctx context.Context, req dto.LoginRequest) (*dto.Log
 	return &dto.LoginResponse{Token: token}, nil
 }
 
-func (s *UserService) ForgotPasswordPassword(
+func (s *UserService) ForgotPassword(
 	ctx context.Context,
-	req dto.ForgotPasswordPasswordRequest,
-) (*dto.ForgotPasswordPasswordResponse, error) {
+	req dto.ForgotPasswordRequest,
+) (*dto.ForgotPasswordResponse, error) {
 	user, err := s.userRepository.FindByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (s *UserService) ForgotPasswordPassword(
 
 	expiryTimeInSeconds := 60 * 60
 
-	token := generateForgotPasswordPasswordToken()
+	token := generateForgotPasswordToken()
 
 	err = s.tokenRepository.CreateToken(ctx, &datastruct.Token{
 		Token:     token,
@@ -117,7 +117,7 @@ func (s *UserService) ForgotPasswordPassword(
 	if err != nil {
 		return nil, err
 	}
-	return &dto.ForgotPasswordPasswordResponse{Token: token}, nil
+	return &dto.ForgotPasswordResponse{Token: token}, nil
 }
 
 func hashPassword(password string) (string, error) {
@@ -151,7 +151,7 @@ func generateJWT(user *datastruct.User) (string, error) {
 	return tokenString, nil
 }
 
-func generateForgotPasswordPasswordToken() string {
+func generateForgotPasswordToken() string {
 	bytes := make([]byte, 15)
 	rand.Read(bytes)
 	token := base32.StdEncoding.EncodeToString(bytes)

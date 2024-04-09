@@ -100,7 +100,7 @@ func TestUserHandler_Register_InvalidRequest(t *testing.T) {
 	// TODO: Check the response body
 }
 
-func TestForgotPasswordPassword(t *testing.T) {
+func TestForgotPassword(t *testing.T) {
 	t.Run("invalid request body", func(t *testing.T) {
 		mockUserService := new(mocks.UserServiceInterface) // Reinitialize mock
 		handler := app.NewUserHandler(mockUserService)     // Assume this correctly creates a handler
@@ -108,24 +108,24 @@ func TestForgotPasswordPassword(t *testing.T) {
 		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBufferString("{invalid json"))
 		recorder := httptest.NewRecorder()
 
-		handler.ForgotPasswordPassword(recorder, req)
+		handler.ForgotPassword(recorder, req)
 
 		if recorder.Code != http.StatusBadRequest {
 			t.Errorf("expected status code %d, got %d", http.StatusBadRequest, recorder.Code)
 		}
 	})
 
-	t.Run("userService ForgotPasswordPassword error", func(t *testing.T) {
+	t.Run("userService ForgotPassword error", func(t *testing.T) {
 		mockUserService := new(mocks.UserServiceInterface) // Reinitialize mock
 		handler := app.NewUserHandler(mockUserService)     // ForgotPassword handler with a new mock
 
-		reqBody, _ := json.Marshal(dto.ForgotPasswordPasswordRequest{Email: "user@example.com"})
+		reqBody, _ := json.Marshal(dto.ForgotPasswordRequest{Email: "user@example.com"})
 		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBuffer(reqBody))
 		recorder := httptest.NewRecorder()
 
-		mockUserService.On("ForgotPasswordPassword", mock.Anything, mock.AnythingOfType("dto.ForgotPasswordPasswordRequest")).Return(nil, errors.New("internal server error"))
+		mockUserService.On("ForgotPassword", mock.Anything, mock.AnythingOfType("dto.ForgotPasswordRequest")).Return(nil, errors.New("internal server error"))
 
-		handler.ForgotPasswordPassword(recorder, req)
+		handler.ForgotPassword(recorder, req)
 
 		if recorder.Code != http.StatusInternalServerError {
 			t.Errorf("expected status code %d, got %d", http.StatusInternalServerError, recorder.Code)
@@ -136,20 +136,20 @@ func TestForgotPasswordPassword(t *testing.T) {
 		mockUserService := new(mocks.UserServiceInterface) // Reinitialize mock for isolation
 		handler := app.NewUserHandler(mockUserService)     // ForgotPassword handler with the new mock
 
-		forgotResponse := &dto.ForgotPasswordPasswordResponse{Token: "Password forgot successfully"}
-		reqBody, _ := json.Marshal(dto.ForgotPasswordPasswordRequest{Email: "user@example.com"})
+		forgotResponse := &dto.ForgotPasswordResponse{Token: "Password forgot successfully"}
+		reqBody, _ := json.Marshal(dto.ForgotPasswordRequest{Email: "user@example.com"})
 		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBuffer(reqBody))
 		recorder := httptest.NewRecorder()
 
-		mockUserService.On("ForgotPasswordPassword", mock.Anything, mock.AnythingOfType("dto.ForgotPasswordPasswordRequest")).Return(forgotResponse, nil)
+		mockUserService.On("ForgotPassword", mock.Anything, mock.AnythingOfType("dto.ForgotPasswordRequest")).Return(forgotResponse, nil)
 
-		handler.ForgotPasswordPassword(recorder, req)
+		handler.ForgotPassword(recorder, req)
 
 		if recorder.Code != http.StatusOK {
 			t.Errorf("expected status code %d, got %d", http.StatusOK, recorder.Code)
 		}
 
-		var response dto.ForgotPasswordPasswordResponse
+		var response dto.ForgotPasswordResponse
 		if err := json.NewDecoder(recorder.Body).Decode(&response); err != nil {
 			t.Fatal("failed to decode response")
 		}

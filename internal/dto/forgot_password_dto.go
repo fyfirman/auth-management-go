@@ -1,9 +1,9 @@
 package dto
 
-type ForgotPasswordPasswordRequest struct {
+type ForgotPasswordRequest struct {
 	Email string `json:"email"`
 }
 
-type ForgotPasswordPasswordResponse struct {
+type ForgotPasswordResponse struct {
 	Token string `json:"token"`
 }

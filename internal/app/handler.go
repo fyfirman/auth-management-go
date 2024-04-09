@@ -84,14 +84,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *UserHandler) ForgotPasswordPassword(w http.ResponseWriter, r *http.Request) {
-	var req dto.ForgotPasswordPasswordRequest
+func (h *UserHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	var req dto.ForgotPasswordRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	resp, err := h.userService.ForgotPasswordPassword(r.Context(), req)
+	resp, err := h.userService.ForgotPassword(r.Context(), req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

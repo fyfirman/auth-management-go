@@ -119,7 +119,7 @@ func TestUserService_Login_InvalidCredentials(t *testing.T) {
 	assert.True(t, errors.Is(err, bcrypt.ErrMismatchedHashAndPassword))
 }
 
-func TestForgotPasswordPassword(t *testing.T) {
+func TestForgotPassword(t *testing.T) {
 
 	t.Skip("Skipped. Need to extract `mail_server` to DI")
 
@@ -135,7 +135,7 @@ func TestForgotPasswordPassword(t *testing.T) {
 		mockUserRepo.On("FindByEmail", ctx, user.Email).Return(user, nil)
 		mockTokenRepo.On("CreateToken", ctx, mock.AnythingOfType("*datastruct.Token")).Return(nil)
 
-		resp, err := userService.ForgotPasswordPassword(ctx, dto.ForgotPasswordPasswordRequest{Email: user.Email})
+		resp, err := userService.ForgotPassword(ctx, dto.ForgotPasswordRequest{Email: user.Email})
 
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
@@ -151,7 +151,7 @@ func TestForgotPasswordPassword(t *testing.T) {
 
 		mockUserRepo.On("FindByEmail", ctx, user.Email).Return(nil, errors.New("user not found"))
 
-		resp, err := userService.ForgotPasswordPassword(ctx, dto.ForgotPasswordPasswordRequest{Email: user.Email})
+		resp, err := userService.ForgotPassword(ctx, dto.ForgotPasswordRequest{Email: user.Email})
 
 		assert.Error(t, err)
 		assert.Nil(t, resp)
@@ -166,7 +166,7 @@ func TestForgotPasswordPassword(t *testing.T) {
 		mockUserRepo.On("FindByEmail", ctx, user.Email).Return(user, nil)
 		mockTokenRepo.On("CreateToken", ctx, mock.AnythingOfType("*datastruct.Token")).Return(errors.New("db error"))
 
-		resp, err := userService.ForgotPasswordPassword(ctx, dto.ForgotPasswordPasswordRequest{Email: user.Email})
+		resp, err := userService.ForgotPassword(ctx, dto.ForgotPasswordRequest{Email: user.Email})
 
 		assert.Error(t, err)
 		assert.Nil(t, resp)

@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/register", userHandler.Register)
 	http.HandleFunc("/login", userHandler.Login)
 	http.HandleFunc("/forgot-password", userHandler.ForgotPassword)
+	http.HandleFunc("/reset-password", userHandler.ResetPassword)
 
 	// Start the HTTP server
 	log.Println("Starting server on :8080")

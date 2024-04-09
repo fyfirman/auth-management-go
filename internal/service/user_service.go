@@ -21,6 +21,7 @@ type UserServiceInterface interface {
 	RegisterUser(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error)
 	ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) (*dto.ForgotPasswordResponse, error)
+	ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error)
 }
 
 type UserService struct {
@@ -118,6 +119,37 @@ func (s *UserService) ForgotPassword(
 		return nil, err
 	}
 	return &dto.ForgotPasswordResponse{Token: token}, nil
+}
+
+func (s *UserService) ResetPassword(
+	ctx context.Context,
+	req dto.ResetPasswordRequest,
+) (*dto.ResetPasswordResponse, error) {
+	token, err := s.tokenRepository.FindByToken(ctx, req.Token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if token.ExpiredAt.Before(time.Now()) {
+		return nil, errors.New("Token is already expired")
+	}
+
+	hashedPassword, err := hashPassword(req.NewPassword)
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.userRepository.UpdatePasswordById(ctx, token.UserId, hashedPassword)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &dto.ResetPasswordResponse{
+		Message: user.Email + " successfully updated",
+	}, nil
 }
 
 func hashPassword(password string) (string, error) {

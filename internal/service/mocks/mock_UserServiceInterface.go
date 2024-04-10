@@ -14,6 +14,36 @@ type UserServiceInterface struct {
 	mock.Mock
 }
 
+// ForgotPassword provides a mock function with given fields: ctx, req
+func (_m *UserServiceInterface) ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) (*dto.ForgotPasswordResponse, error) {
+	ret := _m.Called(ctx, req)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ForgotPassword")
+	}
+
+	var r0 *dto.ForgotPasswordResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, dto.ForgotPasswordRequest) (*dto.ForgotPasswordResponse, error)); ok {
+		return rf(ctx, req)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, dto.ForgotPasswordRequest) *dto.ForgotPasswordResponse); ok {
+		r0 = rf(ctx, req)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*dto.ForgotPasswordResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, dto.ForgotPasswordRequest) error); ok {
+		r1 = rf(ctx, req)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Login provides a mock function with given fields: ctx, req
 func (_m *UserServiceInterface) Login(ctx context.Context, req dto.LoginRequest) (*dto.LoginResponse, error) {
 	ret := _m.Called(ctx, req)
@@ -74,28 +104,28 @@ func (_m *UserServiceInterface) RegisterUser(ctx context.Context, req *dto.Regis
 	return r0, r1
 }
 
-// ForgotPassword provides a mock function with given fields: ctx, req
-func (_m *UserServiceInterface) ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) (*dto.ForgotPasswordResponse, error) {
+// ResetPassword provides a mock function with given fields: ctx, req
+func (_m *UserServiceInterface) ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error) {
 	ret := _m.Called(ctx, req)
 
 	if len(ret) == 0 {
-		panic("no return value specified for ForgotPassword")
+		panic("no return value specified for ResetPassword")
 	}
 
-	var r0 *dto.ForgotPasswordResponse
+	var r0 *dto.ResetPasswordResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, dto.ForgotPasswordRequest) (*dto.ForgotPasswordResponse, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.ResetPasswordRequest) (*dto.ResetPasswordResponse, error)); ok {
 		return rf(ctx, req)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, dto.ForgotPasswordRequest) *dto.ForgotPasswordResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.ResetPasswordRequest) *dto.ResetPasswordResponse); ok {
 		r0 = rf(ctx, req)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*dto.ForgotPasswordResponse)
+			r0 = ret.Get(0).(*dto.ResetPasswordResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, dto.ForgotPasswordRequest) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, dto.ResetPasswordRequest) error); ok {
 		r1 = rf(ctx, req)
 	} else {
 		r1 = ret.Error(1)

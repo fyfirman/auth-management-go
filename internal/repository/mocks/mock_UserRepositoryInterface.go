@@ -62,6 +62,36 @@ func (_m *UserRepositoryInterface) FindByEmail(ctx context.Context, email string
 	return r0, r1
 }
 
+// UpdatePasswordById provides a mock function with given fields: ctx, id, passwordHash
+func (_m *UserRepositoryInterface) UpdatePasswordById(ctx context.Context, id uint, passwordHash string) (*datastruct.User, error) {
+	ret := _m.Called(ctx, id, passwordHash)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdatePasswordById")
+	}
+
+	var r0 *datastruct.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uint, string) (*datastruct.User, error)); ok {
+		return rf(ctx, id, passwordHash)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uint, string) *datastruct.User); ok {
+		r0 = rf(ctx, id, passwordHash)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datastruct.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uint, string) error); ok {
+		r1 = rf(ctx, id, passwordHash)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewUserRepositoryInterface creates a new instance of UserRepositoryInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewUserRepositoryInterface(t interface {

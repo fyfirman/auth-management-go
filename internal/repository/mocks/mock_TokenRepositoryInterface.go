@@ -32,6 +32,36 @@ func (_m *TokenRepositoryInterface) CreateToken(ctx context.Context, user *datas
 	return r0
 }
 
+// FindByToken provides a mock function with given fields: ctx, token
+func (_m *TokenRepositoryInterface) FindByToken(ctx context.Context, token string) (*datastruct.Token, error) {
+	ret := _m.Called(ctx, token)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindByToken")
+	}
+
+	var r0 *datastruct.Token
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*datastruct.Token, error)); ok {
+		return rf(ctx, token)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *datastruct.Token); ok {
+		r0 = rf(ctx, token)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datastruct.Token)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, token)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // NewTokenRepositoryInterface creates a new instance of TokenRepositoryInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewTokenRepositoryInterface(t interface {
